@@ -2,27 +2,29 @@
 
 #include "config.h"
 
-SDL_Window *win;
-SDL_Renderer *ren;
-SDL_Surface *bkg;
-FILE *urandom;
-Uint8 *cells;
-Uint8 *count;
-Uint8 *last_cells;
-Uint8 *last_count;
-SDL_Rect thread_data[THREADS];
-int paused;
-int view;
-int framestep;
+static SDL_Window *win;
+static SDL_Renderer *ren;
+static SDL_Surface *bkg;
+static FILE *urandom;
+static Uint8 *cells;
+static Uint8 *count;
+static Uint8 *last_cells;
+static Uint8 *last_count;
+static SDL_Rect thread_data[THREADS];
+static int paused;
+static int view;
+static int framestep;
 
 #define WINS ( (WINW + 2) * (WINH + 2) )
 #define CELL_REF(cells, x, y) *((cells) + ((x) + 1) + ((y) + 1) * (WINW + 2))
 
+static
 SDL_Color colors_1[] = {
 	{0x00, 0x00, 0x00, 0xFF},
 	{0xFF, 0xFF, 0xFF, 0xFF},
 };
 
+static
 SDL_Color colors_2[] = {
 	{0x00, 0x00, 0x00, 0xFF},
 	{0x00, 0x00, 0x7F, 0xFF},
