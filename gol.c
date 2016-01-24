@@ -1,46 +1,45 @@
-////////////////////////////////////////////////////////////////////////////////
-//
-// Sages Game of Life
-//  - By Sage Raflik
-//
-//  Now with thread support!
-//
-//    This game of life is more optimized than my earlier attemts at making a
-//  game of life implementation straightforward implementation
-//  because it stores sums of surrounding cells in each cell. It also uses some
-//  hacks with a SDL_Surface to speed up frame drawing.
-//
-//  Controlls:
-//   - Left mouse: Draw cells
-//   - Right mouse: Erase cells
-//   - P: Pause
-//   - S: Step individual frame
-//   - R: Fill screen with random cells
-//   - C: Clear the screen
-//   - V: Change view
-//
-//  Compilation:
-//   gcc -o gol gol.c `sdl2-config --cflags --libs`
-//
-//  Features to add:
-//   - Looping edges
-//   - Colors per frame (looping?)
-//   - different rulesets
-//   - resizing scale/size
-//   - load/save full patterns / stamps
-//
-//  Bugfixes:
-//   - clean up palette loading
-//
-////////////////////////////////////////////////////////////////////////////////
+/*
+ * Sages Game of Life
+ *  - By Sage Raflik
+ *
+ *  Now with thread support!
+ *
+ *    This game of life is more optimized than my earlier attempts at making a
+ *  game of life implementation, because it stores sums of surrounding cells in
+ *  each cell, rather than recalculating every frame. It also directly
+ *  interprets the buffers as images to speed up drawing.
+ *
+ *  Controlls:
+ *   - Left mouse: Draw cells
+ *   - Right mouse: Erase cells
+ *   - P: Pause
+ *   - S: Step forward one frame
+ *   - R: Fill screen with random cells
+ *   - C: Clear the screen
+ *   - V: Change view
+ *
+ *  Compilation:
+ *   simply run make
+ *
+ *  Features to add:
+ *   - Looping edges
+ *   - Colors per frame (looping?)
+ *   - different rulesets
+ *   - resizing scale/size
+ *   - load/save full patterns / stamps
+ *
+ *  Bugfixes:
+ *   - clean up palette loading
+ */
 
 // Settings
-#define SCALE 8
-#define WINW (2560/SCALE)
-#define WINH (1440/SCALE)
-#define COLOR1 0x00, 0x00, 0x00, 0xFF
-#define COLOR2 0xFF, 0xFF, 0xFF, 0xFF
+//  Number of threads to use
 #define THREADS 4
+//  Pixels per cell scale
+#define SCALE 4
+//  Width and height
+#define WINW 300
+#define WINH 300
 
 // Code
 #include <SDL2/SDL.h>
@@ -149,10 +148,6 @@ void viewswitch(void)
 void drawbuf(void)
 {
 	static const SDL_Rect src = {1, 1, WINW, WINH};
-
-//	viewswitch();
-
-	puts(SDL_GetError()); // Remove later
 
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bkg);
 	SDL_RenderCopy(ren, tex, &src, NULL);
@@ -269,7 +264,7 @@ int main(int argc, char *argv[])
 
 	paused = 0;
 	view = 0;
-	framestep = 0; // Be more specific, is actually number of framestep to go with step frame
+	framestep = 0;
 
 	bkg = SDL_CreateRGBSurfaceFrom(
 		view ? count : cells,
