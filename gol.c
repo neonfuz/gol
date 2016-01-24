@@ -55,6 +55,7 @@ void cell_off(const int x, const int y)
 	--CELL_REF(count, x-1, y+1); --CELL_REF(count, x+0, y+1); --CELL_REF(count, x+1, y+1);
 }
 
+static
 int sum_cells(void)
 {
 	int x, y, X, Y;
@@ -66,6 +67,7 @@ int sum_cells(void)
 				CELL_REF(cells, x-1, y+1) + CELL_REF(cells, x+0, y+1) + CELL_REF(cells, x+1, y+1);
 }
 
+static
 Uint8 rand1(void)
 {
 	static Uint8 c;
@@ -80,6 +82,7 @@ Uint8 rand1(void)
 	return c & b ? 1 : 0;
 }
 
+static
 void fill_random(void)
 {
 	int x, y;
@@ -90,6 +93,7 @@ void fill_random(void)
 	sum_cells();
 }
 
+static
 void viewswitch(void)
 {
 	view = !view;
@@ -103,6 +107,7 @@ void viewswitch(void)
 		view ? 9 : 2);
 }
 
+static
 void drawbuf(void)
 {
 	static const SDL_Rect src = {1, 1, WINW, WINH};
@@ -112,6 +117,7 @@ void drawbuf(void)
 	SDL_DestroyTexture(tex);
 }
 
+static
 void create_thread_data()
 {
 	int i;
@@ -127,7 +133,8 @@ void create_thread_data()
 	}
 }
 
-static int worker(void *data)
+static
+int worker(void *data)
 {
 	SDL_Rect rect = *(SDL_Rect*)data;
 
@@ -150,6 +157,7 @@ static int worker(void *data)
 	}
 }
 
+static
 void calcframe(void)
 {
 	memcpy( last_cells, cells, WINS * 2 );
@@ -163,6 +171,7 @@ void calcframe(void)
 		SDL_WaitThread(threads[i], NULL);
 }
 
+static
 int input(void)
 {
 	SDL_Event e;
