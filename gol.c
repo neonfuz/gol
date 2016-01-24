@@ -1,48 +1,6 @@
-/*
- * Sages Game of Life
- *  - By Sage Raflik
- *
- *  Now with thread support!
- *
- *    This game of life is more optimized than my earlier attempts at making a
- *  game of life implementation, because it stores sums of surrounding cells in
- *  each cell, rather than recalculating every frame. It also directly
- *  interprets the buffers as images to speed up drawing.
- *
- *  Controlls:
- *   - Left mouse: Draw cells
- *   - Right mouse: Erase cells
- *   - P: Pause
- *   - S: Step forward one frame
- *   - R: Fill screen with random cells
- *   - C: Clear the screen
- *   - V: Change view
- *
- *  Compilation:
- *   simply run make
- *
- *  Features to add:
- *   - Looping edges
- *   - Colors per frame (looping?)
- *   - different rulesets
- *   - resizing scale/size
- *   - load/save full patterns / stamps
- *
- *  Bugfixes:
- *   - clean up palette loading
- */
-
-// Settings
-//  Number of threads to use
-#define THREADS 4
-//  Pixels per cell scale
-#define SCALE 4
-//  Width and height
-#define WINW 300
-#define WINH 300
-
-// Code
 #include <SDL2/SDL.h>
+
+#include "config.h"
 
 SDL_Window *win;
 SDL_Renderer *ren;
