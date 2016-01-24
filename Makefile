@@ -1,3 +1,5 @@
+CFLAGS := -O3 $(CFLAGS)
+
 gol: *.c
 	$(CC) $(CFLAGS) -o gol gol.c `sdl2-config --cflags --libs`
 
