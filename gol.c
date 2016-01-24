@@ -204,7 +204,7 @@ int input(void)
 
 int main(int argc, char *argv[])
 {
-	SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO);
 
 	win = SDL_CreateWindow( "Game of Life", 0, 0, WINW*SCALE, WINH*SCALE, 0 );
 	ren = SDL_CreateRenderer( win, -1, SDL_RENDERER_PRESENTVSYNC );

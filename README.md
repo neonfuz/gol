@@ -8,7 +8,7 @@ making a game of life implementation, because it stores sums of
 surrounding cells, rather than recalculating every frame. It also
 directly interprets the buffers as images to speed up drawing.
 
-## Controlls:
+## Controls:
 - Left mouse: Draw cells
 - Right mouse: Erase cells
 - P: Pause
