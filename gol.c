@@ -64,8 +64,8 @@ void sum_cells(void)
 	for(x=0; x<WINW; ++x)
 		for(y=0; y<WINH; ++y)
 			CELL_REF(count, x, y) =
-				CELL_REF(cells, x-1, y-1) + CELL_REF(cells, x+0, y-1) + CELL_REF(cells, x+1, y-1) + 
-				CELL_REF(cells, x-1, y+0) +                             CELL_REF(cells, x+1, y+0) + 
+				CELL_REF(cells, x-1, y-1) + CELL_REF(cells, x+0, y-1) + CELL_REF(cells, x+1, y-1) +
+				CELL_REF(cells, x-1, y+0) +                             CELL_REF(cells, x+1, y+0) +
 				CELL_REF(cells, x-1, y+1) + CELL_REF(cells, x+0, y+1) + CELL_REF(cells, x+1, y+1);
 }
 
