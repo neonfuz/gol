@@ -58,7 +58,7 @@ void cell_off(const int x, const int y)
 }
 
 static
-int sum_cells(void)
+void sum_cells(void)
 {
 	int x, y, X, Y;
 	for(x=0; x<WINW; ++x)
@@ -157,6 +157,8 @@ int worker(void *data)
 			}
 		}
 	}
+
+    return 0;
 }
 
 static
