@@ -161,9 +161,25 @@ int worker(void *data)
     return 0;
 }
 
+static void clear_borders(void)
+{
+    int x, y;
+    for(x=-1; x<WINW+2; ++x)
+        CELL_REF(cells, x, -1) = CELL_REF(count, x, 0) = 0;
+    for(y=-1; y<WINH+2; ++y)
+        CELL_REF(cells, -1, y) = CELL_REF(count, x, 0) = 0;
+    for(x=-1; x<WINW+2; ++x)
+        CELL_REF(cells, x, WINH+1) = CELL_REF(count, x, 0) = 0;
+    for(y=-1; y<WINH+2; ++y)
+        CELL_REF(cells, -1, WINW+1) = CELL_REF(count, x, 0) = 0;
+}
+
+
 static
 void calcframe(void)
 {
+    clear_borders();
+
 	memcpy( last_cells, cells, WINS * 2 );
 
 	SDL_Thread *threads[THREADS];
