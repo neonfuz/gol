@@ -60,7 +60,7 @@ void cell_off(const int x, const int y)
 static
 void sum_cells(void)
 {
-	int x, y, X, Y;
+	int x, y;
 	for(x=0; x<WINW; ++x)
 		for(y=0; y<WINH; ++y)
 			CELL_REF(count, x, y) =
