@@ -17,6 +17,7 @@ static int framestep;
 
 #define WINS ( (WINW + 2) * (WINH + 2) )
 #define CELL_REF(cells, x, y) *((cells) + ((x) + 1) + ((y) + 1) * (WINW + 2))
+#define LEN(a) ( sizeof(a) / sizeof(a[0]) )
 
 static
 SDL_Color colors_1[] = {
@@ -117,6 +118,22 @@ void drawbuf(void)
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bkg);
 	SDL_RenderCopy(ren, tex, &src, NULL);
 	SDL_DestroyTexture(tex);
+
+#ifdef DEBUG
+    SDL_SetRenderDrawColor(ren, 0xFF, 0xFF, 0x00, 0xFF);
+    int i;
+    for(i=0; i<THREADS; ++i) {
+        SDL_Rect r;
+
+        memcpy(&r, &thread_data[i], sizeof(SDL_Rect));
+        r.x *= SCALE;
+        r.y *= SCALE;
+        r.w *= SCALE;
+        r.h *= SCALE;
+
+        SDL_RenderDrawRect(ren, &r);
+    }
+#endif
 }
 
 static
@@ -151,9 +168,8 @@ int worker(void *data)
 			if( CELL_REF(last_cells, x, y) ) {
 				if( cnt != 2 && cnt != 3 )
 					cell_off(x, y);
-			} else {
-				if( cnt == 3 )
-					cell_on(x, y);
+			} else if( cnt == 3 ) {
+                cell_on(x, y);
 			}
 		}
 	}
@@ -161,7 +177,8 @@ int worker(void *data)
     return 0;
 }
 
-static void clear_borders(void)
+static
+void clear_borders(void)
 {
     int x, y;
     for(x=-1; x<WINW+2; ++x) CELL_REF(cells, x, -1) =      CELL_REF(count, x, -1) = 0;
@@ -169,7 +186,6 @@ static void clear_borders(void)
     for(x=-1; x<WINW+2; ++x) CELL_REF(cells, x, WINH+1) =  CELL_REF(count, x, WINH+1) = 0;
     for(y=-1; y<WINH+2; ++y) CELL_REF(cells, -1, WINW+1) = CELL_REF(count, -1, WINW+1) = 0;
 }
-
 
 static
 void calcframe(void)
@@ -236,10 +252,13 @@ int main(int argc, char *argv[])
 
 	urandom = fopen( "/dev/urandom", "r" );
 
+    /* Allocate a continuous block of memory */
 	Uint8 *memblock = malloc( WINS * 4 );
 	memset( memblock, 0, WINS * 4 );
-	cells = memblock + (WINS * 0);
-	count = memblock + (WINS * 1);
+
+    /* Set buffer pointers */
+	cells =      memblock + (WINS * 0);
+	count =      memblock + (WINS * 1);
 	last_cells = memblock + (WINS * 2);
 	last_count = memblock + (WINS * 3);
 
@@ -261,7 +280,7 @@ int main(int argc, char *argv[])
 		bkg->format->palette,
 		view ? colors_2 : colors_1,
 		0,
-		view ? 9 : 2);
+		view ? LEN(colors_2) : LEN(colors_1) );
 
 	while( input() ) {
 		drawbuf();
