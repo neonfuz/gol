@@ -1,4 +1,7 @@
 #include <SDL2/SDL.h>
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
 
 #include "config.h"
 
@@ -266,6 +269,32 @@ int input(void)
 	return 1;
 }
 
+static
+int mainloop()
+{
+	int loop = input();
+	drawbuf();
+	SDL_RenderPresent( ren );
+	if( framestep || !paused ) {
+		calcframe();
+		if( framestep )
+			--framestep;
+	}
+	return loop;
+}
+
+#ifdef __EMSCRIPTEN__
+static
+void emscripten_mainloop()
+{
+	int loop = mainloop();
+	if( !loop ) {
+		emscripten_cancel_main_loop();
+		SDL_Quit();
+	}
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -305,15 +334,13 @@ int main(int argc, char *argv[])
 		0,
 		view ? LEN(colors_2) : LEN(colors_1) );
 
-	while( input() ) {
-		drawbuf();
-		SDL_RenderPresent( ren );
-		if( framestep || !paused ) {
-			calcframe();
-			if( framestep )
-				--framestep;
-		}
-	}
+	#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(emscripten_mainloop, 0, 1);
+	#endif
+
+	#ifndef __EMSCRIPTEN__
+	while(mainloop());
+	#endif
 
 	SDL_Quit();
     return 0;
