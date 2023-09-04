@@ -8,6 +8,7 @@ gol: gol.c *.h
 
 web/gol.html: gol.c *.h
 	mkdir -p web
+	touch web/.nojekyll
 	emcc gol.c -o $@ -g -lm --bind -s USE_SDL=2 -pthread -s PTHREAD_POOL_SIZE=4
 
 clean:
