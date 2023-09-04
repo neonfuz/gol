@@ -2,8 +2,8 @@
 #define THREADS 4
 
 /*  Pixels per cell scale */
-#define SCALE 8
+#define SCALE 4
 
 /*  Width and height */
-#define WINW 150
-#define WINH 150
+#define WINW 240
+#define WINH 160
