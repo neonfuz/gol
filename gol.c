@@ -10,7 +10,10 @@ static Uint8 *cells;
 static Uint8 *count;
 static Uint8 *last_cells;
 static Uint8 *last_count;
-static SDL_Rect thread_data[THREADS];
+static struct ThreadData {
+	SDL_Rect rect;
+	SDL_mutex *prev, *next;
+} thread_data[THREADS];
 static int paused;
 static int view;
 static int framestep;
@@ -141,38 +144,58 @@ void create_thread_data()
 {
 	int i;
 	for(i=0; i<THREADS; ++i) {
-		thread_data[i].x = 0;
-		thread_data[i].w = WINW;
+		thread_data[i].rect.x = 0;
+		thread_data[i].rect.w = WINW;
 
-		thread_data[i].y = WINH*i/THREADS;
-		thread_data[i].h = WINH - thread_data[i].y;
+		thread_data[i].rect.y = WINH*i/THREADS;
+		thread_data[i].rect.h = WINH - thread_data[i].rect.y;
 
-		if( i != 0 )
-			thread_data[i-1].h -= thread_data[i].h;
+		if( i != 0 ) {
+			thread_data[i-1].rect.h -= thread_data[i].rect.h;
+			thread_data[i-1].next = thread_data[i].prev = SDL_CreateMutex();
+		}
+	}
+}
+
+static inline
+void game_logic(const int x, const int y) {
+	const int count = CELL_REF(last_count, x, y);
+
+	if( CELL_REF(last_cells, x, y) ) {
+		if( count != 2 && count != 3 )
+			cell_off(x, y);
+	} else if( count == 3 ) {
+		cell_on(x, y);
 	}
 }
 
 static
 int worker(void *data)
 {
-	SDL_Rect rect = *(SDL_Rect*)data;
+	struct ThreadData *thread_data = (struct ThreadData*)data;
+	SDL_Rect rect = thread_data->rect;
 
+	// x y w h -> x y x2 y2
 	rect.w += rect.x;
 	rect.h += rect.y;
 
-	int x, y, cnt;
-	for( x = rect.x; x<rect.w; ++x ) {
-		for( y = rect.y; y<rect.h; ++y ) {
-			cnt = CELL_REF(last_count, x, y);
-
-			if( CELL_REF(last_cells, x, y) ) {
-				if( cnt != 2 && cnt != 3 )
-					cell_off(x, y);
-			} else if( cnt == 3 ) {
-                cell_on(x, y);
-			}
+	if (thread_data->prev) SDL_LockMutex(thread_data->prev);
+	for(int x = rect.x; x<rect.w; ++x) {
+		game_logic(x, rect.y);
+		game_logic(x, rect.y+1);
+	}
+	if (thread_data->prev) SDL_UnlockMutex(thread_data->prev);
+	for(int x = rect.x; x<rect.w; ++x) {
+		for(int y = rect.y + 2; y<rect.h - 2; ++y) {
+			game_logic(x, y);
 		}
 	}
+	if (thread_data->next) SDL_LockMutex(thread_data->next);
+	for(int x = rect.x; x<rect.w; ++x) {
+		game_logic(x, rect.h-1);
+		game_logic(x, rect.h-2);
+	}
+	if (thread_data->next) SDL_UnlockMutex(thread_data->next);
 
     return 0;
 }
