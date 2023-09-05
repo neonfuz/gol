@@ -222,11 +222,13 @@ void calcframe(void)
 
 	SDL_Thread *threads[THREADS];
 
-	int i;
-	for(i=0; i<THREADS; ++i)
-		threads[i] = SDL_CreateThread(worker, "worker", &thread_data[i]);
-	for(i=0; i<THREADS; ++i)
-		SDL_WaitThread(threads[i], NULL);
+//	int i;
+//	for(i=0; i<THREADS; ++i)
+//		threads[i] = SDL_CreateThread(worker, "worker", &thread_data[i]);
+//	for(i=0; i<THREADS; ++i)
+//		SDL_WaitThread(threads[i], NULL);
+	for(int i=0; i<THREADS; ++i)
+		worker(&thread_data[i]);
 }
 
 static
