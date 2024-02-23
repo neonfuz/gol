@@ -26,8 +26,8 @@ Edit config.h to configure, then simply run make.
 - different rulesets
 - resizing scale/size
 - load/save full patterns / stamps
+- fix threading on emscripten build 
 
 ## Bugfixes:
 - clean up palette loading
-
 

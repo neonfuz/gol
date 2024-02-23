@@ -1,10 +1,11 @@
-CFLAGS := -O3 $(CFLAGS)
+CFLAGS := -O3 $(CFLAGS) `sdl2-config --cflags`
+LDFLAGS := `sdl2-config --libs`
 
 # macos
 export CPATH=/opt/homebrew/opt/sdl2/include
 
 gol: gol.c *.h
-	$(CC) $(CFLAGS) gol.c -o $@ `sdl2-config --cflags --libs`
+	$(CC) $(CFLAGS) $(LDFLAGS) gol.c -o $@
 
 docs/gol.html: gol.c *.h
 	mkdir -p docs

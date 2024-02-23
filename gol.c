@@ -77,7 +77,7 @@ void sum_cells(void)
 }
 
 static
-Uint8 rand1(void)
+Uint8 random_bit(void)
 {
     static Uint8 c;
     static Uint16 b = 0;
@@ -97,13 +97,13 @@ void fill_random(void)
     int x, y;
     for(x=0; x<WINW; ++x)
         for(y=0; y<WINH; ++y)
-            CELL_REF(cells, x, y) = rand1();
+            CELL_REF(cells, x, y) = random_bit();
 
     sum_cells();
 }
 
 static
-void viewswitch(void)
+void view_switch(void)
 {
     view = !view;
 
@@ -117,7 +117,7 @@ void viewswitch(void)
 }
 
 static
-void drawbuf(void)
+void draw_buf(void)
 {
     static const SDL_Rect src = {1, 1, WINW, WINH};
 
@@ -158,6 +158,11 @@ void create_thread_data()
             thread_data[i-1].next = thread_data[i].prev = SDL_CreateMutex();
         }
     }
+    for(i=0; i<THREADS; ++i) {
+        // x y w h -> x y x2 y2
+        thread_data[i].rect.w += thread_data[i].rect.x;
+        thread_data[i].rect.h += thread_data[i].rect.y;
+    }
 }
 
 static inline
@@ -177,10 +182,6 @@ int worker(void *data)
 {
     struct ThreadData *thread_data = (struct ThreadData*)data;
     SDL_Rect rect = thread_data->rect;
-
-    // x y w h -> x y x2 y2
-    rect.w += rect.x;
-    rect.h += rect.y;
 
     if (thread_data->prev) SDL_LockMutex(thread_data->prev);
     for(int x = rect.x; x<rect.w; ++x) {
@@ -214,7 +215,7 @@ void clear_borders(void)
 }
 
 static
-void calcframe(void)
+void calc_frame(void)
 {
     clear_borders();
 
@@ -267,7 +268,7 @@ int input(void)
                 SDL_SetWindowTitle( win, paused ? "Game of Life *PAUSED*" : "Game of Life" );
                 break;
             case SDLK_c: memset( cells, 0, WINS * 2 ); break;
-            case SDLK_v: viewswitch(); break;
+            case SDLK_v: view_switch(); break;
             case SDLK_s: ++framestep; break;
             }
             break;
@@ -281,10 +282,10 @@ static
 int mainloop()
 {
     int loop = input();
-    drawbuf();
+    draw_buf();
     SDL_RenderPresent( ren );
     if( framestep || !paused ) {
-        calcframe();
+        calc_frame();
         if( framestep )
             --framestep;
     }
